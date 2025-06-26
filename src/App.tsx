@@ -13,13 +13,18 @@ const App: React.FC = () => {
   const [arrows, setArrows] = useState<Arrow[]>([]);
   const [baseImage, setBaseImage] = useState<HTMLImageElement | null>(null);
   const [isAddingArrow, setIsAddingArrow] = useState(false);
-  const [arrowStart, setArrowStart] = useState<{ x: number; y: number } | null>(null);
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const [arrowStart, setArrowStart] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const [mousePosition, setMousePosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   useEffect(() => {
     const handlePaste = async (e: ClipboardEvent) => {
       e.preventDefault();
-      
+
       const items = e.clipboardData?.items;
       if (!items) return;
 
@@ -30,42 +35,39 @@ const App: React.FC = () => {
 
           const img = new Image();
           const url = URL.createObjectURL(blob);
-          
+
           img.onload = () => {
             setBaseImage(img);
             URL.revokeObjectURL(url);
           };
-          
+
           img.src = url;
           break;
         }
       }
     };
 
-    const handleCopy = async (e: ClipboardEvent) => {
-      if (e.ctrlKey && e.key === 'c') {
-        e.preventDefault();
-        
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+    const handleCopy = async () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-        canvas.toBlob(async (blob) => {
-          if (!blob) return;
-          
-          try {
-            await navigator.clipboard.write([
-              new ClipboardItem({ 'image/png': blob })
-            ]);
-          } catch (err) {
-            console.error('Failed to copy to clipboard:', err);
-          }
-        });
-      }
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob }),
+          ]);
+        } catch (err) {
+          console.error('Failed to copy to clipboard:', err);
+        }
+      });
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'c') {
-        handleCopy(e as unknown as ClipboardEvent);
+        e.preventDefault();
+        handleCopy();
       }
     };
 
@@ -100,18 +102,24 @@ const App: React.FC = () => {
       const height = baseImage.height * scale;
       const x = (canvas.width - width) / 2;
       const y = (canvas.height - height) / 2;
-      
+
       ctx.drawImage(baseImage, x, y, width, height);
     }
 
     // Draw arrows
-    arrows.forEach(arrow => {
+    arrows.forEach((arrow) => {
       drawArrow(ctx, arrow.startX, arrow.startY, arrow.endX, arrow.endY);
     });
 
     // Draw preview arrow when in arrow mode with start point set
     if (isAddingArrow && arrowStart && mousePosition) {
-      drawArrow(ctx, arrowStart.x, arrowStart.y, mousePosition.x, mousePosition.y);
+      drawArrow(
+        ctx,
+        arrowStart.x,
+        arrowStart.y,
+        mousePosition.x,
+        mousePosition.y
+      );
     }
   }, [baseImage, arrows, isAddingArrow, arrowStart, mousePosition]);
 
@@ -167,7 +175,7 @@ const App: React.FC = () => {
         startX: arrowStart.x,
         startY: arrowStart.y,
         endX: x,
-        endY: y
+        endY: y,
       };
       setArrows([...arrows, newArrow]);
       setArrowStart(null);
@@ -232,9 +240,9 @@ const App: React.FC = () => {
         <canvas
           ref={canvasRef}
           className="border"
-          style={{ 
+          style={{
             backgroundColor: 'white',
-            cursor: isAddingArrow ? 'crosshair' : 'default'
+            cursor: isAddingArrow ? 'crosshair' : 'default',
           }}
           width={800}
           height={600}
@@ -248,20 +256,23 @@ const App: React.FC = () => {
         <div className="container-fluid">
           <div className="d-flex justify-content-between align-items-center">
             <span className="text-muted">
-              Ctrl+V to paste • {isAddingArrow ? 'Click to set arrow start and end' : 'Ctrl+C to copy'}
+              Ctrl+V to paste •{' '}
+              {isAddingArrow
+                ? 'Click to set arrow start and end'
+                : 'Ctrl+C to copy'}
             </span>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => {
                 const canvas = canvasRef.current;
                 if (!canvas) return;
-                
+
                 canvas.toBlob(async (blob) => {
                   if (!blob) return;
-                  
+
                   try {
                     await navigator.clipboard.write([
-                      new ClipboardItem({ 'image/png': blob })
+                      new ClipboardItem({ 'image/png': blob }),
                     ]);
                     alert('Image copied to clipboard!');
                   } catch (err) {
