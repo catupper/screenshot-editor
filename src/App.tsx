@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [baseImage, setBaseImage] = useState<HTMLImageElement | null>(null);
   const [isAddingArrow, setIsAddingArrow] = useState(false);
   const [arrowStart, setArrowStart] = useState<{ x: number; y: number } | null>(null);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const handlePaste = async (e: ClipboardEvent) => {
@@ -107,7 +108,12 @@ const App: React.FC = () => {
     arrows.forEach(arrow => {
       drawArrow(ctx, arrow.startX, arrow.startY, arrow.endX, arrow.endY);
     });
-  }, [baseImage, arrows]);
+
+    // Draw preview arrow when in arrow mode with start point set
+    if (isAddingArrow && arrowStart && mousePosition) {
+      drawArrow(ctx, arrowStart.x, arrowStart.y, mousePosition.x, mousePosition.y);
+    }
+  }, [baseImage, arrows, isAddingArrow, arrowStart, mousePosition]);
 
   const drawArrow = (
     ctx: CanvasRenderingContext2D,
@@ -166,6 +172,26 @@ const App: React.FC = () => {
       setArrows([...arrows, newArrow]);
       setArrowStart(null);
       setIsAddingArrow(false);
+      setMousePosition(null);
+    }
+  };
+
+  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isAddingArrow || !arrowStart) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setMousePosition({ x, y });
+  };
+
+  const handleCanvasMouseLeave = () => {
+    if (isAddingArrow && arrowStart) {
+      setMousePosition(null);
     }
   };
 
@@ -174,6 +200,7 @@ const App: React.FC = () => {
     setArrows([]);
     setArrowStart(null);
     setIsAddingArrow(false);
+    setMousePosition(null);
   };
 
   return (
@@ -185,7 +212,11 @@ const App: React.FC = () => {
             <div className="ms-auto">
               <button
                 className={`btn ${isAddingArrow ? 'btn-danger' : 'btn-primary'} me-2`}
-                onClick={() => setIsAddingArrow(!isAddingArrow)}
+                onClick={() => {
+                  setIsAddingArrow(!isAddingArrow);
+                  setArrowStart(null);
+                  setMousePosition(null);
+                }}
               >
                 {isAddingArrow ? 'Cancel Arrow' : 'Add Arrow'}
               </button>
@@ -208,6 +239,8 @@ const App: React.FC = () => {
           width={800}
           height={600}
           onClick={handleCanvasClick}
+          onMouseMove={handleCanvasMouseMove}
+          onMouseLeave={handleCanvasMouseLeave}
         ></canvas>
       </main>
 

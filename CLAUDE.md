@@ -8,10 +8,10 @@ This is a screenshot editor web application built with React, TypeScript, and Vi
 
 ## Development Commands
 
-- `npm run dev` - Start the development server with hot module replacement
-- `npm run build` - Build for production (runs TypeScript compiler then Vite build)
-- `npm run lint` - Run ESLint to check code quality
-- `npm run preview` - Preview the production build locally
+- `pnpm run dev` - Start the development server with hot module replacement
+- `pnpm run build` - Build for production (runs TypeScript compiler then Vite build)
+- `pnpm run lint` - Run ESLint to check code quality
+- `pnpm run preview` - Preview the production build locally
 
 ## Architecture
 
