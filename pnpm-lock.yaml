@@ -11,9 +11,6 @@ importers:
       bootstrap:
         specifier: ^5.3.7
         version: 5.3.7(@popperjs/core@2.11.8)
-      playwright:
-        specifier: ^1.53.1
-        version: 1.53.1
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -48,6 +45,9 @@ importers:
       globals:
         specifier: ^16.2.0
         version: 16.2.0
+      playwright:
+        specifier: ^1.53.1
+        version: 1.53.1
       typescript:
         specifier: ~5.8.3
         version: 5.8.3
