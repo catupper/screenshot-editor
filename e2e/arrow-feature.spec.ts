@@ -1,9 +1,5 @@
-import { test, expect } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import {expect, test} from '@playwright/test';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 test.describe('矢印追加機能', () => {
   test.beforeEach(async ({ page }) => {
@@ -54,8 +50,7 @@ test.describe('矢印追加機能', () => {
 
   test('画像貼り付け後の矢印描画', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    
-    const testImagePath = path.join(__dirname, 'test-image.png');
+
     const buffer = await page.evaluate(async () => {
       const canvas = document.createElement('canvas');
       canvas.width = 400;
